@@ -2,11 +2,7 @@ package com.rahul.demosystem.demosystem.tag;
 
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
@@ -15,6 +11,7 @@ public class Tag {
 
     @Id
     @Column(name = "tag_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int tagId;
 
     @NotEmpty(message = "The description can't be empty")
