@@ -1,0 +1,12 @@
+
+### Files and directory mentioned here are not included in repository. ###
+
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+
+.idea
+.mvn
+*.iws
+*.iml
+*.ipr
