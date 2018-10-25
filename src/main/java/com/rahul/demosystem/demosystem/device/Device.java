@@ -1,14 +1,17 @@
 package com.rahul.demosystem.demosystem.device;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import org.hibernate.validator.constraints.Length;
-
 import javax.validation.constraints.NotEmpty;
+
+import static com.rahul.demosystem.demosystem.device.Status.Idle;
 
 @Entity
 public class Device {
@@ -24,15 +27,16 @@ public class Device {
      * for security reasons @Column(nullable = false) is also used.
      */
 
-    @NotEmpty(message = "The description must not be empty")
+    @NotEmpty(message = "The description can't be empty")
     @Length(max = 500, message = "Description must be less than 500 characters.")
     @Column(nullable = false)
     private String description;
 
 
+    @Enumerated(EnumType.STRING)
     @NotEmpty(message = "The status can't be empty")
     @Column(nullable = false)
-    private String status;
+    private Status status = Idle;
 
     @Column(name = "operator_id")
     private int operatorId;
@@ -44,7 +48,7 @@ public class Device {
     /********************************* Constructor *********************************/
     public Device(){}
 
-    public Device(String description, String status, int operatorId, int protocolId) {
+    public Device(String description, Status status, int operatorId, int protocolId) {
 
         this.description = description;
         this.status = status;
@@ -71,11 +75,11 @@ public class Device {
         this.description = description;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -94,6 +98,9 @@ public class Device {
     public void setProtocolId(int protocolId) {
         this.protocolId = protocolId;
     }
+
+
+    /***************************** toString method **************************/
 
     @Override
     public String toString() {
