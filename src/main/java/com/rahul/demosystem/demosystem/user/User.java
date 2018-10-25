@@ -10,6 +10,9 @@ import javax.validation.constraints.NotEmpty;
 import java.util.HashSet;
 import java.util.Set;
 
+//@JsonIdentityInfo(
+//        generator = ObjectIdGenerators.PropertyGenerator.class,
+//        property = "userId")
 @Entity
 public class User {
 
@@ -32,9 +35,9 @@ public class User {
     private String email;
 
 
-
+    //JsonManagedReference & JsonBackReference is used to prevent from infinite loop
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
-    @JsonIgnore
+    @JsonBackReference
     private Set<Device> devices = new HashSet<Device>();
 
 
