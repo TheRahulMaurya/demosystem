@@ -2,23 +2,34 @@ package com.rahul.demosystem.demosystem.tag;
 
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
+
+import static com.rahul.demosystem.demosystem.tag.IsActive.N;
 
 @Entity
 public class Tag {
 
     @Id
-    @Column(name = "tag_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "tag_id")
     private int tagId;
 
     @NotEmpty(message = "The description can't be empty")
     @Length(max = 200, message = "Description must be less than 200 characters.")
+    @Column(nullable = false)
     private String description;
 
-    private boolean isActive;
+
+    @Column(name = "is_active")
+    private IsActive isActive = N;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_on")
@@ -28,13 +39,14 @@ public class Tag {
 
     public Tag(){}
 
-    public Tag(int tagId, String description, boolean isActive) {
+    public Tag(int tagId, String description, IsActive isActive) {
         this.tagId = tagId;
         this.description = description;
         this.isActive = isActive;
     }
 
     /***************************** Getters & Setters *****************************/
+
     public int getTagId() {
         return tagId;
     }
@@ -51,11 +63,11 @@ public class Tag {
         this.description = description;
     }
 
-    public boolean isActive() {
+    public IsActive isActive() {
         return isActive;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(IsActive active) {
         isActive = active;
     }
 
