@@ -1,30 +1,44 @@
 package com.rahul.demosystem.demosystem.user;
 
+import com.fasterxml.jackson.annotation.*;
+import com.rahul.demosystem.demosystem.device.Device;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "user_id")
     private int userId;
 
     @NotEmpty(message = "The Username can't be empty")
     @Length(max = 500, message = "Username must be less than 500 characters.")
+    @Column(name = "user_name", nullable = false)
     private String userName;
 
-    @NotEmpty(message = "The title can't be empty")
-    @Length(max = 200, message = "Title must be less than 200 characters.")
+
+    @JsonIgnore
+    @NotEmpty(message = "The email can't be empty")
+    @Length(max = 200, message = "Email must be less than 200 characters.")
+    @Email(message = "Please provide a valid e-mail")
+    @Column(name = "email", nullable = false , unique = true)
     private String email;
 
-    private int deviceId;
 
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
+    @JsonIgnore
+    private Set<Device> devices = new HashSet<Device>();
+
+
+    @Column(name = "tag_id")
     private int tagId;
 
 
@@ -32,15 +46,16 @@ public class User {
 
     public User(){}
 
-    public User(int userId, String userName, String email, int deviceId, int tagId) {
+    public User(int userId, String userName, String email, Set<Device> devices, int tagId) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;
-        this.deviceId = deviceId;
+        this.devices = devices;
         this.tagId = tagId;
     }
 
     /***************************** Getters & Setters *****************************/
+
     public int getUserId() {
         return userId;
     }
@@ -65,12 +80,12 @@ public class User {
         this.email = email;
     }
 
-    public int getDeviceId() {
-        return deviceId;
+    public Set<Device> getDeviceId() {
+        return devices;
     }
 
-    public void setDeviceId(int deviceId) {
-        this.deviceId = deviceId;
+    public void setDeviceId(Set<Device> deviceId) {
+        this.devices = devices;
     }
 
     public int getTagId() {
@@ -89,7 +104,7 @@ public class User {
                 "userId=" + userId +
                 ", userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
-                ", deviceId=" + deviceId +
+                ", devices=" + devices +
                 ", tagId=" + tagId +
                 '}';
     }
