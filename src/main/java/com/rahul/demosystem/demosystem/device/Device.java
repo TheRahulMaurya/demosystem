@@ -12,6 +12,9 @@ import java.util.Set;
 
 import static com.rahul.demosystem.demosystem.device.Status.Idle;
 
+//@JsonIdentityInfo(
+//        generator = ObjectIdGenerators.PropertyGenerator.class,
+//        property = "deviceId")
 @Entity
 public class Device {
 
@@ -19,6 +22,7 @@ public class Device {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="device_id")
     private int deviceId;
+
 
     /** @NotNull is a Bean Validation annotation.It has nothing to do with database constraints
      * itself but Hibernate translate this into database constraints for us.
@@ -40,6 +44,7 @@ public class Device {
 
 
     //FetchType.LAZY is used when we don't want all the details of user
+    //JsonManagedReference & JsonBackReference is used to prevent from infinite loop
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
             CascadeType.ALL
@@ -49,6 +54,7 @@ public class Device {
                 joinColumns = {@JoinColumn(name = "device_id" , referencedColumnName = "device_id")},
                 inverseJoinColumns = {@JoinColumn(name = "operator_id" ,referencedColumnName = "user_id")}
                 )
+    @JsonManagedReference
     private Set<User> users = new HashSet<User>();
 
 
