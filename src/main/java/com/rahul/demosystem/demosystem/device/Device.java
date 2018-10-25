@@ -1,15 +1,14 @@
 package com.rahul.demosystem.demosystem.device;
 
+import com.fasterxml.jackson.annotation.*;
+import com.rahul.demosystem.demosystem.user.User;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.rahul.demosystem.demosystem.device.Status.Idle;
 
@@ -18,6 +17,7 @@ public class Device {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name="device_id")
     private int deviceId;
 
     /** @NotNull is a Bean Validation annotation.It has nothing to do with database constraints
@@ -29,17 +29,28 @@ public class Device {
 
     @NotEmpty(message = "The description can't be empty")
     @Length(max = 500, message = "Description must be less than 500 characters.")
-    @Column(nullable = false)
+    @Column(name="description" , nullable = false)
     private String description;
 
 
     @Enumerated(EnumType.STRING)
     @NotEmpty(message = "The status can't be empty")
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private Status status = Idle;
 
-    @Column(name = "operator_id")
-    private int operatorId;
+
+    //FetchType.LAZY is used when we don't want all the details of user
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+            CascadeType.ALL
+            })
+    @JoinTable(
+                name = "device_user_map",
+                joinColumns = {@JoinColumn(name = "device_id" , referencedColumnName = "device_id")},
+                inverseJoinColumns = {@JoinColumn(name = "operator_id" ,referencedColumnName = "user_id")}
+                )
+    private Set<User> users = new HashSet<User>();
+
 
     @Column(name = "protocol_id")
     private int protocolId;
@@ -48,14 +59,12 @@ public class Device {
     /********************************* Constructor *********************************/
     public Device(){}
 
-    public Device(String description, Status status, int operatorId, int protocolId) {
-
+    public Device(String description, Status status, Set<User> users, int protocolId) {
         this.description = description;
         this.status = status;
-        this.operatorId = operatorId;
+        this.users = users;
         this.protocolId = protocolId;
     }
-
 
     /***************************** Getters & Setters *****************************/
 
@@ -83,12 +92,12 @@ public class Device {
         this.status = status;
     }
 
-    public int getOperatorId() {
-        return operatorId;
+    public Set<User> getOperatorId() {
+        return users;
     }
 
-    public void setOperatorId(int operatorId) {
-        this.operatorId = operatorId;
+    public void setOperatorId(Set<User> operatorId) {
+        this.users = operatorId;
     }
 
     public int getProtocolId() {
@@ -108,7 +117,7 @@ public class Device {
                 "deviceId=" + deviceId +
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
-                ", operatorId=" + operatorId +
+                ", users=" + users +
                 ", protocolId=" + protocolId +
                 '}';
     }
