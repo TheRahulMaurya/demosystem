@@ -1,18 +1,21 @@
 package com.rahul.demosystem.demosystem.user;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.rahul.demosystem.demosystem.device.Device;
+import com.rahul.demosystem.demosystem.tag.Tag;
 import org.hibernate.validator.constraints.Length;
+
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+
 import java.util.HashSet;
 import java.util.Set;
 
-//@JsonIdentityInfo(
-//        generator = ObjectIdGenerators.PropertyGenerator.class,
-//        property = "userId")
+
 @Entity
 public class User {
 
@@ -34,27 +37,28 @@ public class User {
     @Column(name = "email", nullable = false , unique = true)
     private String email;
 
-
-    //JsonManagedReference & JsonBackReference is used to prevent from infinite loop
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
+    
+    //JsonBackReference is used to prevent from infinite loop
+    @ManyToMany(mappedBy = "users")
     @JsonBackReference
     private Set<Device> devices = new HashSet<Device>();
 
 
-    @Column(name = "tag_id")
-    private int tagId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tag_id")
+    private Tag tag;
 
 
     /********************************* Constructor *********************************/
 
     public User(){}
 
-    public User(int userId, String userName, String email, Set<Device> devices, int tagId) {
+    public User(int userId, String userName, String email, Set<Device> devices, Tag tag) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;
         this.devices = devices;
-        this.tagId = tagId;
+        this.tag = tag;
     }
 
     /***************************** Getters & Setters *****************************/
@@ -83,20 +87,20 @@ public class User {
         this.email = email;
     }
 
-    public Set<Device> getDeviceId() {
+    public Set<Device> getDevices() {
         return devices;
     }
 
-    public void setDeviceId(Set<Device> deviceId) {
+    public void setDevices(Set<Device> devices) {
         this.devices = devices;
     }
 
-    public int getTagId() {
-        return tagId;
+    public Tag getTag() {
+        return tag;
     }
 
-    public void setTagId(int tagId) {
-        this.tagId = tagId;
+    public void setTag(Tag tag) {
+        this.tag = tag;
     }
 
     /***************************** toString method ******************************/
@@ -108,7 +112,7 @@ public class User {
                 ", userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
                 ", devices=" + devices +
-                ", tagId=" + tagId +
+                ", tag=" + tag +
                 '}';
     }
 }
