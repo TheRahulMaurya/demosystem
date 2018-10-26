@@ -1,20 +1,33 @@
 package com.rahul.demosystem.demosystem.device;
 
-import com.fasterxml.jackson.annotation.*;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.rahul.demosystem.demosystem.protocol.Protocol;
 import com.rahul.demosystem.demosystem.user.User;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotEmpty;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.rahul.demosystem.demosystem.device.Status.Idle;
 
-//@JsonIdentityInfo(
-//        generator = ObjectIdGenerators.PropertyGenerator.class,
-//        property = "deviceId")
+
+
 @Entity
 public class Device {
 
@@ -43,33 +56,32 @@ public class Device {
     private Status status = Idle;
 
 
-    //FetchType.LAZY is used when we don't want all the details of user
-    //JsonManagedReference & JsonBackReference is used to prevent from infinite loop
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
+    //FetchType.LAZY is used when we don't want to show all the details of user
+    //JsonManagedReference is used to prevent from infinite loop
+    @ManyToMany(cascade = {
             CascadeType.ALL
             })
     @JoinTable(
                 name = "device_user_map",
-                joinColumns = {@JoinColumn(name = "device_id" , referencedColumnName = "device_id")},
-                inverseJoinColumns = {@JoinColumn(name = "operator_id" ,referencedColumnName = "user_id")}
+                joinColumns = {@JoinColumn(name = "device_id" )},
+                inverseJoinColumns = {@JoinColumn(name = "user_id")}
                 )
     @JsonManagedReference
     private Set<User> users = new HashSet<User>();
 
 
-    @Column(name = "protocol_id")
-    private int protocolId;
+    @OneToMany(mappedBy = "device")
+    private List<Protocol> protocols ; 
 
 
     /********************************* Constructor *********************************/
     public Device(){}
 
-    public Device(String description, Status status, Set<User> users, int protocolId) {
+    public Device(String description, Status status, Set<User> users, List<Protocol> protocols) {
         this.description = description;
         this.status = status;
         this.users = users;
-        this.protocolId = protocolId;
+        this.protocols = protocols;
     }
 
     /***************************** Getters & Setters *****************************/
@@ -98,24 +110,27 @@ public class Device {
         this.status = status;
     }
 
-    public Set<User> getOperatorId() {
-        return users;
-    }
+  
 
-    public void setOperatorId(Set<User> operatorId) {
-        this.users = operatorId;
-    }
+    public Set<User> getUsers() {
+		return users;
+	}
 
-    public int getProtocolId() {
-        return protocolId;
-    }
-
-    public void setProtocolId(int protocolId) {
-        this.protocolId = protocolId;
-    }
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
 
 
-    /***************************** toString method **************************/
+
+    public List<Protocol> getProtocols() {
+		return protocols;
+	}
+
+	public void setProtocols(List<Protocol> protocols) {
+		this.protocols = protocols;
+	}
+
+	/***************************** toString method **************************/
 
     @Override
     public String toString() {
@@ -124,7 +139,7 @@ public class Device {
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
                 ", users=" + users +
-                ", protocolId=" + protocolId +
+                ", protocols=" + protocols +
                 '}';
     }
 }
