@@ -34,7 +34,7 @@ public class DeviceServiceImpl implements DeviceService {
 
 
         //checking if protocol is assigned to someone or not
-        Device deviceHavingProtocol = deviceRepository.findByProtocol(protocol).orElse(null);
+        Device deviceHavingProtocol = deviceRepository.findByDeviceId(protocol.getDevice().getDeviceId()).orElse(null);
 
         if(  deviceHavingProtocol != null )
             throw new IOException("Protocol is already assigned to someone");
