@@ -1,7 +1,9 @@
 package com.rahul.demosystem.demosystem.protocol;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator;
+
 import org.hibernate.validator.constraints.Length;
 
 import com.rahul.demosystem.demosystem.device.Device;
@@ -14,7 +16,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -22,6 +23,11 @@ import javax.validation.constraints.NotEmpty;
 
 import java.util.Date;
 
+
+
+@JsonIdentityInfo(generator = PropertyGenerator.class, 
+					property  = "protocolId", 
+					scope     = Protocol.class)
 @Entity
 public class Protocol {
 
@@ -36,8 +42,8 @@ public class Protocol {
     @Column(nullable = false)
     private String title;
     
-    @JsonIgnore
-    @ManyToOne
+    
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "device_id")
     private Device device;
     
@@ -48,7 +54,6 @@ public class Protocol {
     private Date createdOn = new Date();
 
 
-    @NotEmpty(message = "The title can't be empty")
     @Column(name = "effective_date", nullable = false)
     private Date effectiveDate;
 
@@ -93,7 +98,6 @@ public class Protocol {
         this.title = title;
     }
     
-    
 
     public Device getDevice() {
 		return device;
@@ -119,7 +123,7 @@ public class Protocol {
         this.effectiveDate = effectiveDate;
     }
 
-    /***************************** toString method **************************/
+    /***************************** toString method for testing purpose **************************/
 
     @Override
     public String toString() {
