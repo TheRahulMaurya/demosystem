@@ -7,6 +7,8 @@ import com.rahul.demosystem.demosystem.user.User;
 public interface UserService {
 	
 	User validateUser(User user) throws IOException;
+
+	void userExistOrNot(int userId) throws IOException;
 	
 	
 }
