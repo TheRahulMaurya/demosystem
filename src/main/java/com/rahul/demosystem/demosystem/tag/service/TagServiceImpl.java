@@ -16,12 +16,24 @@ public class TagServiceImpl implements TagService {
     @Override
     public Tag validateTag(Tag tag) throws IOException {
 
-        Tag oldTag = tagRepository.findByDescription( tag.getDescription() ).orElse(null);
+        Tag oldTag = tagRepository.findByTagId( tag.getTagId() ).orElse(null);
 
+        // checking if role is given to someone or not
         if(oldTag != null)
-            throw new IOException(" Description already exist..");
-
+            throw new IOException(" Role already given to someone...");
 
         return tag;
+    }
+
+    @Override
+    public boolean isTagExist(int tagId){
+        Tag existingTag = tagRepository
+                        .findById(tagId)
+                        .orElse(null);
+
+        if(existingTag == null)
+            return false;
+
+        return true;
     }
 }

@@ -7,6 +7,8 @@ import java.io.IOException;
 public interface TagService {
 
     Tag validateTag(Tag tag) throws IOException;
+
+    boolean isTagExist(int tagId) ;
 	
 
 }
