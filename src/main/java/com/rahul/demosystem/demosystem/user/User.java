@@ -1,21 +1,34 @@
 package com.rahul.demosystem.demosystem.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator;
 
 import com.rahul.demosystem.demosystem.device.Device;
 import com.rahul.demosystem.demosystem.tag.Tag;
 import org.hibernate.validator.constraints.Length;
 
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
+@JsonIdentityInfo(generator = PropertyGenerator.class, 
+property  = "userId", 
+scope     = User.class)
 @Entity
 public class User {
 
@@ -30,7 +43,7 @@ public class User {
     private String userName;
 
 
-    @JsonIgnore
+    @JsonProperty(access = Access.WRITE_ONLY)
     @NotEmpty(message = "The email can't be empty")
     @Length(max = 200, message = "Email must be less than 200 characters.")
     @Email(message = "Please provide a valid e-mail")
@@ -40,11 +53,11 @@ public class User {
     
     //JsonBackReference is used to prevent from infinite loop
     @ManyToMany(mappedBy = "users")
-    @JsonBackReference
-    private Set<Device> devices = new HashSet<Device>();
+//    @JsonBackReference
+    private List<Device> devices = new ArrayList<Device>();
 
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
@@ -53,7 +66,7 @@ public class User {
 
     public User(){}
 
-    public User(int userId, String userName, String email, Set<Device> devices, Tag tag) {
+    public User(int userId, String userName, String email, List<Device> devices, Tag tag) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;
@@ -87,11 +100,11 @@ public class User {
         this.email = email;
     }
 
-    public Set<Device> getDevices() {
+    public List<Device> getDevices() {
         return devices;
     }
 
-    public void setDevices(Set<Device> devices) {
+    public void setDevices(List<Device> devices) {
         this.devices = devices;
     }
 
@@ -103,7 +116,7 @@ public class User {
         this.tag = tag;
     }
 
-    /***************************** toString method ******************************/
+    /***************************** toString method for testing purpose******************************/
 
     @Override
     public String toString() {
@@ -115,4 +128,21 @@ public class User {
                 ", tag=" + tag +
                 '}';
     }
+
+
+    /****************************** Equals Method for Comparison between two objects ****************************/
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return userId == user.userId &&
+                Objects.equals(userName, user.userName) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(devices, user.devices) &&
+                Objects.equals(tag, user.tag);
+    }
+
+
 }
