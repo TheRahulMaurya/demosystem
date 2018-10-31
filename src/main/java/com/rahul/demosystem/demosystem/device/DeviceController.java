@@ -77,11 +77,7 @@ public class DeviceController {
 
 
         //assign protocol to device
-        List<Protocol> protocols = deviceService.assignProtocolToDevice(existingDevice , protocol);
-        
-        existingDevice.setProtocols(protocols);
-        
-        deviceRepository.save(existingDevice);
+        deviceService.assignProtocolToDevice(existingDevice , protocol);
 
         Iterable<Device> devices = deviceRepository.findAll();
         return devices;

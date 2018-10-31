@@ -3,12 +3,12 @@ package com.rahul.demosystem.demosystem.device.service;
 import com.rahul.demosystem.demosystem.device.Device;
 import com.rahul.demosystem.demosystem.device.DeviceRepository;
 import com.rahul.demosystem.demosystem.protocol.Protocol;
+import com.rahul.demosystem.demosystem.protocol.ProtocolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 
 @Service
@@ -20,10 +20,14 @@ public class DeviceServiceImpl implements DeviceService {
     @Autowired
     DeviceRepository deviceRepository;
 
+    @Autowired
+    ProtocolRepository protocolRepository;
+
 
     @Override
-    public List<Protocol> assignProtocolToDevice(Device device, Protocol protocol) throws IOException {
+    public boolean assignProtocolToDevice(Device device, Protocol protocol) throws IOException {
 
+        Device existingDevice;
         Date date = new Date();
 
         Date effectiveDate = protocol.getEffectiveDate();
@@ -34,15 +38,16 @@ public class DeviceServiceImpl implements DeviceService {
 
 
         //checking if protocol is assigned to someone or not
-        Device deviceHavingProtocol = deviceRepository.findByDeviceId(protocol.getDevice().getDeviceId()).orElse(null);
+        existingDevice = protocol.getDevice();
 
-        if(  deviceHavingProtocol != null )
+        if(  existingDevice != null )
             throw new IOException("Protocol is already assigned to someone");
 
-        List<Protocol> protocolList = device.getProtocols();
-        protocolList.add(protocol);
+        protocol.setDevice(device);
 
-        return protocolList;
+        protocolRepository.save(protocol);
+
+        return true;
 
     }
 }
